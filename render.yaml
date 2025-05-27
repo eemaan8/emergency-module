@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: emergency-backend
+    name: emergency-module
     env: python
     buildCommand: pip install -r requirements.txt
     startCommand: python app.py
