@@ -1,26 +1,35 @@
 from flask import Flask, request, jsonify
 import os
 import json
+import base64
 from twilio.rest import Client
 import firebase_admin
 from firebase_admin import credentials, db
 
-# Flask app init
+# Flask app initialization
 app = Flask(__name__)
 
-# Twilio credentials from env vars
+# Load Firebase credentials from base64 env variable
+firebase_key_b64 = os.environ.get('FIREBASE_KEY_BASE64')
+firebase_key_path = '/tmp/firebase_key.json'
+
+# Write decoded credentials to temp file
+with open(firebase_key_path, 'wb') as f:
+    f.write(base64.b64decode(firebase_key_b64))
+
+# Initialize Firebase with database URL
+firebase_cred = credentials.Certificate(firebase_key_path)
+firebase_admin.initialize_app(firebase_cred, {
+    'databaseURL': 'https://emergency-module-1c979-default-rtdb.firebaseio.com/'  # 🔁 Replace if needed
+})
+
+# Load Twilio credentials from environment variables
 account_sid = os.environ.get('TWILIO_ACCOUNT_SID')
 auth_token = os.environ.get('TWILIO_AUTH_TOKEN')
 twilio_number = os.environ.get('TWILIO_PHONE_NUMBER')
 
-# Twilio client
+# Initialize Twilio client
 client = Client(account_sid, auth_token)
-
-# Firebase credentials (service account .json)
-firebase_cred = credentials.Certificate("firebase_key.json")
-firebase_admin.initialize_app(firebase_cred, {
-    'databaseURL': 'https://emergency-module-1c979-default-rtdb.firebaseio.com/'  # 🔁 Replace this with your actual URL
-})
 
 # Firebase contact helpers
 def load_contacts():
@@ -43,7 +52,7 @@ def send_sms(to_number, message):
 # Routes
 @app.route("/")
 def home():
-    return "Emergency Contact API is running with Firebase!"
+    return "🚀 Emergency Contact API is running with Firebase!"
 
 @app.route("/add_contact", methods=["POST"])
 def add_contact():
@@ -89,7 +98,5 @@ def send_alert():
 
     return jsonify(response)
 
-# For Render.com port setup
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+# For Render port setup
+i
