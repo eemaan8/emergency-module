@@ -52,7 +52,7 @@ def send_sms(to_number, message):
 # Routes
 @app.route("/")
 def home():
-    return "🚀 Emergency Contact API is running with Firebase!"
+    return "Emergency Contact API is running with Firebase!"
 
 @app.route("/add_contact", methods=["POST"])
 def add_contact():
